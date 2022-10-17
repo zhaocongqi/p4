@@ -17,7 +17,7 @@ control BF_Sketch(
     Hash<bit<32>>(HashAlgorithm_t.CUSTOM, poly) hash_unit;
 
     action hash(){
-        meta.key = hash_unit.get({ hdr.ipv4.src_addr,hdr.ipv4.dst_addr,hdr.ports.src_port,hdr.ports.dst_port,hdr.ipv4.protocol });
+        meta.key = hash_unit.get({ hdr.ipv4.src_addr,hdr.ipv4.dst_addr,hdr.ipv4.protocol,hdr.ports.src_port,hdr.ports.dst_port });
     }
 
     @pragma stage 0
@@ -254,7 +254,7 @@ control BF_Sketch(
     }
 
     apply{
-        if(hdr.ipv4.isValid() && (hdr.tcp.isValid() || hdr.udp.isValid())){
+        if(hdr.mpls.isValid() && hdr.ipv4.isValid() && (hdr.tcp.isValid() || hdr.udp.isValid())){
             // Hash
             tbl_hash.apply();
             // Set delay threshold

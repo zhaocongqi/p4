@@ -18,7 +18,7 @@ control BF_Sketch(
     Hash<bit<32>>(HashAlgorithm_t.CUSTOM, poly) hash_unit;
 
     action hash(){
-        meta.key = hash_unit.get({ hdr.ipv4.src_addr,hdr.ipv4.dst_addr,hdr.ports.src_port,hdr.ports.dst_port,hdr.ipv4.protocol });
+        meta.key = hash_unit.get({ hdr.ipv4.src_addr,hdr.ipv4.dst_addr,hdr.ipv4.protocol,hdr.ports.src_port,hdr.ports.dst_port });
         meta.global_tstamp = eg_prsr_md.global_tstamp;
         meta.delay = ((bit<64>)meta.global_tstamp - (bit<64>)meta.ingress_mac_tstamp)[31:0];
     }
@@ -256,12 +256,8 @@ control BF_Sketch(
         size = 2;
     }
 
-    apply{parser EgressParser(
-       ^^^^^^^^^^^^
-/root/zcq/tna_mpls/p4src/bf_sketch.p4(23): error: header fields cannot be used in wide arithmetic ops, if field.size *mod* 32 != 0. But field egress::eg_intr_md_from_prsr.global_tstamp with 48 bits is involved in: sub
-        meta.delay = ((bit<64>)meta.global_tstamp - (bit<64>)meta.ingress_mac_tstamp)[47:0];
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        if(hdr.ipv4.isValid() && (hdr.tcp.isValid() || hdr.udp.isValid())){
+    apply{
+        if(hdr.mpls.isValid() && hdr.ipv4.isValid() && (hdr.tcp.isValid() || hdr.udp.isValid())){
             // Hash
             tbl_hash.apply();
             // Set delay threshold
