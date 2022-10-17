@@ -28,15 +28,15 @@ while line:
     dst_addr = ''.join('%02X' % int(i) for i in DstIP.split('.'))
     src_addr = int(src_addr,16)
     dst_addr = int(dst_addr,16)
-    crc32_func1_exp_value = crc32_func1(struct.pack("!IIBHH", src_addr,dst_addr,17,SrcPort,DstPort)) & 0xffffffff
+    crc32_func1_exp_value = crc32_func1(struct.pack("!IIBHH", src_addr,dst_addr,Protocol,SrcPort,DstPort)) & 0xffffffff
     crc32_func1_exp_value_hex = "{:08x}".format(crc32_func1_exp_value)
     # print(crc32_func1_exp_value_hex)
 
-    crc32_func2_exp_value = crc32_func2(struct.pack("!IIBHH", src_addr,dst_addr,17,SrcPort,DstPort)) & 0xffffffff
+    crc32_func2_exp_value = crc32_func2(struct.pack("!IIBHH", src_addr,dst_addr,Protocol,SrcPort,DstPort)) & 0xffffffff
     crc32_func2_exp_value_hex = "{:08x}".format(crc32_func2_exp_value)
     # print(crc32_func2_exp_value_hex)
 
-    crc32_func3_exp_value = crc32_func3(struct.pack("!IIBHH", src_addr,dst_addr,17,SrcPort,DstPort)) & 0xffffffff
+    crc32_func3_exp_value = crc32_func3(struct.pack("!IIBHH", src_addr,dst_addr,Protocol,SrcPort,DstPort)) & 0xffffffff
     crc32_func3_exp_value_hex = "{:08x}".format(crc32_func3_exp_value)
     # print(crc32_func3_exp_value_hex)
 
