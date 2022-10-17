@@ -1,6 +1,14 @@
 from ipaddress import ip_address
+import sys
+import time
+import json
+import signal
+sys.path.append('/usr/local/lib/python3.5/dist-packages')
+import redis
+import schedule
 
-p4 = bfrt.mpls.pipe
+p4 = bfrt.main.pipe
+redis_cli = redis.Redis(host='localhost',port=6379,db=15)
 
 # This function can clear all the tables and later on other fixed objects
 # once bfrt support is added.
@@ -60,17 +68,35 @@ def clear_all(verbose=True, batching=True):
         if table['type'] in ['ACTION_PROFILE']:
             _clear(table, verbose=verbose, batching=batching)
     
-#clear_all()
+# Route Set
+def simple_fwd():
+    p4.Ingress.simple_fwd.clear()
+    p4.Ingress.simple_fwd.add_with_hit(ingress_port=130,port=131)
+    p4.Ingress.simple_fwd.add_with_hit(ingress_port=131,port=130)
 
-ipv4_host = p4.Ingress.ipv4_host
-ipv4_host.add_with_send(dst_addr=ip_address('10.0.0.2'),   port=130)
-ipv4_host.add_with_send(dst_addr=ip_address('10.0.0.1'),   port=129)
+# Set Redis and Clear Sketch and Bloomfilter
+def set_redis():
+    global time
+    global redis_cli
+    print("--- 5 SECONDS ---")
+    t = time.perf_counter()
+    for table in p4.Egress.bf_sketch.info(return_info=True, print_info=False):
+        if table['type'] in ['REGISTER']:
+            key = table['full_name'].split('.')[3]
+            value = table['node'].dump(json=True,return_ents=True,from_hw=True)
+            redis_cli.set(key, value)
+    print("Sketch获取耗时: ")
+    print(time.perf_counter() - t)
+    for table in p4.Egress.bf_sketch.info(return_info=True, print_info=False):
+        if table['type'] in ['REGISTER']:
+            table['node'].clear()
 
-bfrt.complete_operations()
-
-# Final programming
-print("""
-******************* PROGAMMING RESULTS *****************
-""")
-print ("Table ipv4_host:")
-ipv4_host.dump(table=True)
+simple_fwd()
+schedule.every(5).seconds.do(set_redis)
+time.sleep(5)
+schedule.run_pending()
+# while True:
+#     try:
+#         schedule.run_pending()
+#     except:
+#         break
