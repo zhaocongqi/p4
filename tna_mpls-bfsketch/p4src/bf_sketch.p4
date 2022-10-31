@@ -17,7 +17,7 @@ control BF_Sketch(
     Hash<bit<32>>(HashAlgorithm_t.CUSTOM, poly) hash_unit;
 
     action getdelay() {
-        meta.delay = hdr.mpls.label;
+        meta.delay = hdr.mpls.label[7:0];
     }
 
     action hash(){
@@ -165,14 +165,14 @@ control BF_Sketch(
         size = 2;
     }
 
-    Register<pair, bit<16>>(32) sketch1;
-    Register<pair, bit<16>>(32) sketch2;
-    Register<pair, bit<16>>(32) sketch3;
+    Register<pair, bit<16>>(65536) sketch1;
+    Register<pair, bit<16>>(65536) sketch2;
+    Register<pair, bit<16>>(65536) sketch3;
 
     RegisterAction<pair, bit<16>, bit<1>>(sketch1)
     leave_pair1 = {
         void apply(inout pair value) {
-            value.delay = value.delay |+| (bit<32>)meta.delay[15:0];
+            value.delay = value.delay |+| (bit<32>)meta.delay;
             value.count = value.count |+| 1;
         }
     };
@@ -180,7 +180,7 @@ control BF_Sketch(
     RegisterAction<pair, bit<16>, bit<1>>(sketch2)
     leave_pair2 = {
         void apply(inout pair value) {
-            value.delay = value.delay |+| (bit<32>)meta.delay[15:0];
+            value.delay = value.delay |+| (bit<32>)meta.delay;
             value.count = value.count |+| 1;
         }
     };
@@ -188,21 +188,27 @@ control BF_Sketch(
     RegisterAction<pair, bit<16>, bit<1>>(sketch3)
     leave_pair3 = {
         void apply(inout pair value) {
-            value.delay = value.delay |+| (bit<32>)meta.delay[15:0];
+            value.delay = value.delay |+| (bit<32>)meta.delay;
             value.count = value.count |+| 1;
         }
     };
 
+    action get_index(){
+        meta.index1 = meta.key[15:0] & 0xBFFF;
+        meta.index2 = meta.key[23:8] & 0xBFFF;
+        meta.index3 = meta.key[31:16] & 0xBFFF;
+    }
+
     action sketch1_add(){
-        leave_pair1.execute((bit<16>)meta.key[4:0]);
+        leave_pair1.execute(meta.index1);
     }
 
     action sketch2_add(){
-        leave_pair2.execute((bit<16>)meta.key[12:8]);
+        leave_pair2.execute(meta.index2);
     }
 
     action sketch3_add(){
-        leave_pair3.execute((bit<16>)meta.key[20:16]);
+        leave_pair3.execute(meta.index3);
     }
 
     action send(){
@@ -265,7 +271,7 @@ control BF_Sketch(
             tbl_hash.apply();
             // Set delay threshold
             // tbl_threshold.apply();
-            if(meta.delay > 0xFFFF){
+            if(meta.delay > 0x19){
                 meta.bloomfilter_flag = 1;
             }
             // Check bloomfilter
@@ -273,6 +279,7 @@ control BF_Sketch(
             tbl_hash2_operation.apply();
             tbl_hash3_operation.apply();
             // CM_Sketch
+            get_index();
             tbl_sketch1_operation.apply();
             tbl_sketch2_operation.apply();
             tbl_sketch3_operation.apply();
