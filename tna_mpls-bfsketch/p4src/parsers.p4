@@ -100,6 +100,7 @@ parser EgressParser(
         meta.key = 0;
         meta.bloomfilter_flag = 0;
         meta.sketch_flag = 0;
+        meta.mask = 0xFFFF;
         transition parse_bridge;
     }
 

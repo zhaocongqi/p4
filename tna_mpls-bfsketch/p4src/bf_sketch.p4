@@ -194,9 +194,9 @@ control BF_Sketch(
     };
 
     action get_index(){
-        meta.index1 = meta.key[15:0] & 0xBFFF;
-        meta.index2 = meta.key[23:8] & 0xBFFF;
-        meta.index3 = meta.key[31:16] & 0xBFFF;
+        meta.index1 = meta.key[15:0] & meta.mask;
+        meta.index2 = meta.key[23:8] & meta.mask;
+        meta.index3 = meta.key[31:16] & meta.mask;
     }
 
     action sketch1_add(){
@@ -271,7 +271,7 @@ control BF_Sketch(
             tbl_hash.apply();
             // Set delay threshold
             // tbl_threshold.apply();
-            if(meta.delay > 0x19){
+            if(meta.delay > 0xFF){
                 meta.bloomfilter_flag = 1;
             }
             // Check bloomfilter

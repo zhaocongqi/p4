@@ -66,8 +66,25 @@ control Egress(
     inout egress_intrinsic_metadata_for_deparser_t eg_dprsr_md,
     inout egress_intrinsic_metadata_for_output_port_t eg_oport_md)
 {
+    action set_mask(bit<16> mask) {
+        meta.mask = mask;
+    }
+
+    table tbl_mask {
+        key = {
+            eg_intr_md.egress_port : exact;
+        }
+        actions = {
+            set_mask;
+            NoAction;
+        }
+        const default_action = NoAction();
+        size = 32;
+    }
+
     BF_Sketch() bf_sketch;
     apply {
+        tbl_mask.apply();
         bf_sketch.apply(hdr, meta);
     }
 }

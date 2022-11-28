@@ -101,4 +101,5 @@ struct my_egress_metadata_t {
     bit<16> index1;
     bit<16> index2;
     bit<16> index3;
+    bit<16> mask;
 }
