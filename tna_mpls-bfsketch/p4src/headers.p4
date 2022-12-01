@@ -94,12 +94,14 @@ struct my_egress_headers_t {
 
 struct my_egress_metadata_t {
     bridge_h bridge;
-    bit<32> key;
     bit<8> delay;
     bit<1> bloomfilter_flag;
     bit<1> sketch_flag;
-    bit<16> index1;
-    bit<16> index2;
-    bit<16> index3;
-    bit<16> mask;
+    bit<32> index1;
+    bit<32> index2;
+    bit<32> index3;
+    bit<32> index4;
+    bit<32> index5;
+    bit<32> index6;
+    bit<32> mask;
 }

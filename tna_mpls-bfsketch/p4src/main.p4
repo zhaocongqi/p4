@@ -66,7 +66,7 @@ control Egress(
     inout egress_intrinsic_metadata_for_deparser_t eg_dprsr_md,
     inout egress_intrinsic_metadata_for_output_port_t eg_oport_md)
 {
-    action set_mask(bit<16> mask) {
+    action set_mask(bit<32> mask) {
         meta.mask = mask;
     }
 

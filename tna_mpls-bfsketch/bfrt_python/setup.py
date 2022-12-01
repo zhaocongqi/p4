@@ -76,10 +76,10 @@ def simple_fwd():
     p4.Ingress.simple_fwd.add_with_hit(ingress_port=128,port=129)
     p4.Ingress.simple_fwd.add_with_hit(ingress_port=129,port=128)
     p4.Egress.tbl_mask.clear()
-    p4.Egress.tbl_mask.add_with_set_mask(egress_port=128,mask=0x0FFF)
-    p4.Egress.tbl_mask.add_with_set_mask(egress_port=129,mask=0x0FFF)
-    p4.Egress.tbl_mask.add_with_set_mask(egress_port=130,mask=0x0FFF)
-    p4.Egress.tbl_mask.add_with_set_mask(egress_port=131,mask=0x0FFF)
+    p4.Egress.tbl_mask.add_with_set_mask(egress_port=128,mask=0x0001FFFF)
+    p4.Egress.tbl_mask.add_with_set_mask(egress_port=129,mask=0x0001FFFF)
+    p4.Egress.tbl_mask.add_with_set_mask(egress_port=130,mask=0x0001FFFF)
+    p4.Egress.tbl_mask.add_with_set_mask(egress_port=131,mask=0x0001FFFF)
 
 # Set Redis and Clear Sketch and Bloomfilter
 def set_redis():
@@ -99,7 +99,7 @@ def set_redis():
             table['node'].clear()
 
 simple_fwd()
-# set_redis()
+set_redis()
 # schedule.every(5).seconds.do(set_redis)
 # time.sleep(5)
 # schedule.run_pending()
