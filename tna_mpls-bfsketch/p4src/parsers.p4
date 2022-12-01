@@ -99,7 +99,7 @@ parser EgressParser(
     state meta_init {
         meta.bloomfilter_flag = 0;
         meta.sketch_flag = 0;
-        meta.mask = 0x000FFFFF;
+        meta.mask = 0x0001FFFF;
         transition parse_bridge;
     }
 
