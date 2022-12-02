@@ -300,6 +300,9 @@ control BF_Sketch(
         meta.index1 = meta.index1 & meta.mask;
         meta.index2 = meta.index2 & meta.mask;
         meta.index3 = meta.index3 & meta.mask;
+        meta.index4 = meta.index4 & meta.mask;
+        meta.index5 = meta.index5 & meta.mask;
+        meta.index6 = meta.index6 & meta.mask;
     }
 
     action sketch1_add(){
@@ -433,7 +436,7 @@ control BF_Sketch(
             tbl_hash6.apply();
             // Set delay threshold
             // tbl_threshold.apply();
-            if(meta.delay > 0xFF){
+            if(meta.delay > 0x63){
                 meta.bloomfilter_flag = 1;
             }
             // Check bloomfilter

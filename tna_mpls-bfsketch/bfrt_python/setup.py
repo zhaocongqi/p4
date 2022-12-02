@@ -76,10 +76,17 @@ def simple_fwd():
     p4.Ingress.simple_fwd.add_with_hit(ingress_port=128,port=129)
     p4.Ingress.simple_fwd.add_with_hit(ingress_port=129,port=128)
     p4.Egress.tbl_mask.clear()
-    p4.Egress.tbl_mask.add_with_set_mask(egress_port=128,mask=0x0001FFFF)
-    p4.Egress.tbl_mask.add_with_set_mask(egress_port=129,mask=0x0001FFFF)
-    p4.Egress.tbl_mask.add_with_set_mask(egress_port=130,mask=0x0001FFFF)
-    p4.Egress.tbl_mask.add_with_set_mask(egress_port=131,mask=0x0001FFFF)
+    # 0x00000FFF
+    # 0x00001FFF
+    # 0x00003FFF
+    # 0x00007FFF
+    # 0x0000FFFF
+    # 0x0001FFFF
+    mymask=0x00000FFF
+    p4.Egress.tbl_mask.add_with_set_mask(egress_port=128,mask=mymask)
+    p4.Egress.tbl_mask.add_with_set_mask(egress_port=129,mask=mymask)
+    p4.Egress.tbl_mask.add_with_set_mask(egress_port=130,mask=mymask)
+    p4.Egress.tbl_mask.add_with_set_mask(egress_port=131,mask=mymask)
 
 # Set Redis and Clear Sketch and Bloomfilter
 def set_redis():
@@ -90,6 +97,8 @@ def set_redis():
     for table in p4.Egress.bf_sketch.info(return_info=True, print_info=False):
         if table['type'] in ['REGISTER']:
             key = table['full_name'].split('.')[3]
+            if key in ['bloomfilter1','bloomfilter2','bloomfilter3']:
+                continue
             value = table['node'].dump(json=True,return_ents=True,from_hw=True)
             redis_cli.set(key, value)
     print("Sketch获取耗时: ")
