@@ -1,19 +1,15 @@
 # This is neeeded to execure "run_pd_rpc"
 from ipaddress import ip_address
-p4 = bfrt.simple_l3_mirror2.pipe
+p4 = bfrt.loss.pipe
 
 NextSeq = p4.Ingress.NextSeq
-Flag = p4.Ingress.Flag
-flag = p4.Ingress.flag
-nextseq = p4.Ingress.nextseq
+Loss = p4.Ingress.Loss
+Reorder = p4.Ingress.Reorder
 
-# NextSeq.clear()
-# Flag.clear()
-
-# NextSeq.dump(table=True,from_hw=True)
-# Flag.dump(table=True,from_hw=True)
+NextSeq.clear()
+Loss.clear()
+Reorder.clear()
 
 NextSeq.get(from_hw=True,REGISTER_INDEX=0)
-Flag.get(from_hw=True,REGISTER_INDEX=0)
-nextseq.get(from_hw=True,REGISTER_INDEX=0)
-flag.get(from_hw=True,REGISTER_INDEX=0)
+Loss.get(from_hw=True,REGISTER_INDEX=0)
+Reorder.get(from_hw=True,REGISTER_INDEX=0)

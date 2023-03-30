@@ -229,14 +229,16 @@ control Ingress(
         }else{
             drop();
         }
-        
-        hash();
-        bit<16> flag = get_seq.execute(0);
-        if(flag == 0x00){
-            get_reorder.execute(0);
-        }else{
-            meta.loss = hdr.mpls.label[15:0] - flag;
-            get_loss.execute(0);
+
+        if(hdr.ipv4.isValid() && hdr.mpls.isValid()){
+            hash();
+            bit<16> flag = get_seq.execute(0);
+            if(flag == 0x00){
+                get_reorder.execute(0);
+            }else{
+                meta.loss = hdr.mpls.label[15:0] - flag;
+                get_loss.execute(0);
+            }
         }
     }
 }
