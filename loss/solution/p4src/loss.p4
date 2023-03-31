@@ -191,7 +191,7 @@ control Ingress(
         meta.hash = hash_algo.get({ hdr.ipv4.src_addr,hdr.ipv4.dst_addr,hdr.ipv4.protocol,hdr.ports.src_port,hdr.ports.dst_port });
     }
 
-    Register<bit<16>, bit<32>>(16,1) NextSeq;
+    Register<bit<16>, bit<32>>(131072,1) NextSeq;
 
     RegisterAction<bit<16>, bit<32>, bit<16>>(NextSeq)
     get_seq = {
@@ -205,7 +205,7 @@ control Ingress(
         }
     };
 
-    Register<bit<16>, bit<32>>(16,0) Loss;
+    Register<bit<16>, bit<32>>(131072,0) Loss;
 
     RegisterAction<bit<16>, bit<32>, bit<16>>(Loss)
     get_loss = {
@@ -214,7 +214,7 @@ control Ingress(
         }
     };
 
-    Register<bit<16>, bit<32>>(16,0) Reorder;
+    Register<bit<16>, bit<32>>(131072,0) Reorder;
 
     RegisterAction<bit<16>, bit<32>, bit<16>>(Reorder)
     get_reorder = {
@@ -232,12 +232,12 @@ control Ingress(
 
         if(hdr.ipv4.isValid() && hdr.mpls.isValid()){
             hash();
-            bit<16> flag = get_seq.execute(0);
+            bit<16> flag = get_seq.execute((bit<32>)meta.hash[16:0]);
             if(flag == 0x00){
-                get_reorder.execute(0);
+                get_reorder.execute((bit<32>)meta.hash[16:0]);
             }else{
                 meta.loss = hdr.mpls.label[15:0] - flag;
-                get_loss.execute(0);
+                get_loss.execute((bit<32>)meta.hash[16:0]);
             }
         }
     }
